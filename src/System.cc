@@ -18,8 +18,6 @@
 * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
-
 #include "System.h"
 #include "Converter.h"
 #include <thread>
@@ -379,6 +377,22 @@ void System::SaveTrajectoryTUM(const string &filename)
     cout << endl << "trajectory saved!" << endl;
 }
 
+bool System::GetFramePose(cv::Mat &Twc, float *q)
+{
+    cv::Mat Rwc(3,1,CV_32F);
+    if(mpTracker->mState != 2) //track not ok
+        return false;
+
+    if(!mpMapDrawer->GetCurrentPose(Rwc, Twc))
+            return false;
+
+    std::vector<float> _q = Converter::toQuaternion(Rwc);
+    for(int i=0; i<4; ++i)
+    {
+        q[i] = _q[i];
+    }
+    return true;
+}
 
 void System::SaveKeyFrameTrajectoryTUM(const string &filename)
 {

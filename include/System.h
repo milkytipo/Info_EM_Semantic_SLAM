@@ -25,7 +25,9 @@
 #include<string>
 #include<thread>
 #include<opencv2/core/core.hpp>
-
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "Tracking.h"
 #include "FrameDrawer.h"
 #include "MapDrawer.h"
@@ -111,6 +113,9 @@ public:
     // Call first Shutdown()
     // See format details at: http://www.cvlibs.net/datasets/kitti/eval_odometry.php
     void SaveTrajectoryKITTI(const string &filename);
+
+    //get frame pose
+    bool GetFramePose(cv::Mat &Twc, float *q);
 
     // TODO: Save/Load functions
     // SaveMap(const string &filename);

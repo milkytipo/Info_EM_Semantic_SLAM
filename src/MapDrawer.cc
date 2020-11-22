@@ -261,4 +261,16 @@ void MapDrawer::GetCurrentOpenGLCameraMatrix(pangolin::OpenGlMatrix &M)
         M.SetIdentity();
 }
 
+bool MapDrawer::GetCurrentPose(cv::Mat &Rwc, cv::Mat &Twc)
+{
+    if(!mCameraPose.empty())
+    {
+        unique_lock<mutex> lock(mMutexCamera);
+        Rwc = mCameraPose.rowRange(0,3).colRange(0,3).t();
+        Twc = -Rwc*mCameraPose.rowRange(0,3).col(3);
+        return true;
+    }
+    return false;
+}
+
 } //namespace ORB_SLAM

@@ -10,7 +10,7 @@
 * (at your option) any later version.
 *
 * ORB-SLAM2 is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* but WITHOUT ANY WARRANTY; wit hout even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 *
@@ -18,7 +18,9 @@
 * along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h> 
 #include "Tracking.h"
 
 #include<opencv2/core/core.hpp>
