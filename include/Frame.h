@@ -60,6 +60,8 @@ public:
     // Extract ORB on the image. 0 for left image and 1 for right image.
     void ExtractORB(int flag, const cv::Mat &im);
 
+    void ExtractORBWithROI(int flag, const cv::Mat &iRoi, const cv::Mat &im);
+
     // Compute Bag of Words representation.
     void ComputeBoW();
 

@@ -252,6 +252,14 @@ void Frame::ExtractORB(int flag, const cv::Mat &im)
         (*mpORBextractorRight)(im,cv::Mat(),mvKeysRight,mDescriptorsRight);
 }
 
+void Frame::ExtractORBWithROI(int flag, const cv::Mat &iRoi, const cv::Mat &im)
+{
+    if(flag==0)
+        (*mpORBextractorLeft)(im, cv::Mat(),mvKeys,mDescriptors,iRoi);
+    else
+        (*mpORBextractorRight)(im,cv::Mat(),mvKeysRight,mDescriptorsRight, iRoi);
+}
+
 void Frame::SetPose(cv::Mat Tcw)
 {
     mTcw = Tcw.clone();
