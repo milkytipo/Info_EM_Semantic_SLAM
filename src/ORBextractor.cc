@@ -766,8 +766,7 @@ void ORBextractor::ComputeKeyPointsOctTree(vector<vector<KeyPoint> >& allKeypoin
 {
     allKeypoints.resize(nlevels);
 
-    const float W = 30;
-
+    const float W = 30;//width of cell
     for (int level = 0; level < nlevels; ++level)
     {
         const int minBorderX = EDGE_THRESHOLD-3;
@@ -795,9 +794,12 @@ void ORBextractor::ComputeKeyPointsOctTree(vector<vector<KeyPoint> >& allKeypoin
                 continue;
             if(maxY>maxBorderY)
                 maxY = maxBorderY;
-
+            
             for(int j=0; j<nCols; j++)
             {
+                //check if the pixel is in the Roi area， 255 is default value for Roi (cv::Mat)
+                if(mRoi.ptr<uchar>(i)[j] == 255)
+                    continue;
                 const float iniX =minBorderX+j*wCell;
                 float maxX = iniX+wCell+6;
                 if(iniX>=maxBorderX-6)
@@ -1054,9 +1056,7 @@ void ORBextractor::operator()( cv::InputArray _image, cv::InputArray _mask, std:
     Mat iRoi = _iRoi.getMat();
     assert(iRoi.type() == CV_8UC1 );
 
-    //TODO:： 
-    //feature + label;
-
+    mRoi = iRoi.clone();
 
     // Pre-compute the scale pyramid
     ComputePyramid(image);
@@ -1096,7 +1096,9 @@ void ORBextractor::operator()( cv::InputArray _image, cv::InputArray _mask, std:
 
         // Compute the descriptors
         Mat desc = descriptors.rowRange(offset, offset + nkeypointsLevel);
-        computeDescriptors(workingMat, keypoints, desc, pattern);
+        
+        //workingMat:images of ith level in pyramid; keypoints: keypoint in ith level; desc: descriptor area in descriptors' Mat; pattern: don't know
+        computeDescriptors(workingMat, keypoints, desc, pattern); 
 
         offset += nkeypointsLevel;
 

@@ -416,6 +416,13 @@ int MapPoint::PredictScale(const float &currentDist, Frame* pF)
     return nScale;
 }
 
+void MapPoint::ComputeEntropy()
+{
+    if(mP > 0 && mP <=1){
+        mEntropy = - mP*(log(mP)/log(2));
+    }
 
+    return;
+}
 
 } //namespace ORB_SLAM

@@ -2,6 +2,8 @@
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "files.associations": {
         "*.ipp": "cpp",
-        "array": "cpp"
+        "array": "cpp",
+        "string_view": "cpp",
+        "cmath": "cpp"
     }
 }

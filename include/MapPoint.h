@@ -24,6 +24,7 @@
 #include"KeyFrame.h"
 #include"Frame.h"
 #include"Map.h"
+#include<cmath>
 
 #include<opencv2/core/core.hpp>
 #include<mutex>
@@ -80,6 +81,8 @@ public:
     float GetMaxDistanceInvariance();
     int PredictScale(const float &currentDist, KeyFrame*pKF);
     int PredictScale(const float &currentDist, Frame* pF);
+    
+    void ComputeEntropy();
 
 public:
     long unsigned int mnId;
