@@ -115,10 +115,56 @@ static void computeOrbDescriptor(const KeyPoint& kpt,
     const uchar* center = &img.at<uchar>(cvRound(kpt.pt.y), cvRound(kpt.pt.x));
     const int step = (int)img.step;
 
+    //rotation invariant
     #define GET_VALUE(idx) \
         center[cvRound(pattern[idx].x*b + pattern[idx].y*a)*step + \
                cvRound(pattern[idx].x*a - pattern[idx].y*b)]
 
+
+    for (int i = 0; i < 32; ++i, pattern += 16)
+    {
+        int t0, t1, val;
+        t0 = GET_VALUE(0); t1 = GET_VALUE(1);
+        val = t0 < t1;
+        t0 = GET_VALUE(2); t1 = GET_VALUE(3);
+        val |= (t0 < t1) << 1;
+        t0 = GET_VALUE(4); t1 = GET_VALUE(5);
+        val |= (t0 < t1) << 2;
+        t0 = GET_VALUE(6); t1 = GET_VALUE(7);
+        val |= (t0 < t1) << 3;
+        t0 = GET_VALUE(8); t1 = GET_VALUE(9);
+        val |= (t0 < t1) << 4;
+        t0 = GET_VALUE(10); t1 = GET_VALUE(11);
+        val |= (t0 < t1) << 5;
+        t0 = GET_VALUE(12); t1 = GET_VALUE(13);
+        val |= (t0 < t1) << 6;
+        t0 = GET_VALUE(14); t1 = GET_VALUE(15);
+        val |= (t0 < t1) << 7;
+
+        desc[i] = (uchar)val;
+    }
+
+    #undef GET_VALUE
+}
+static void computeOrbDescriptorWithRoi(const KeyPoint& kpt,
+                                 const Mat& img, const Point* pattern,
+                                 uchar* desc, const Mat& iroi)
+{
+    float angle = (float)kpt.angle*factorPI;
+    float a = (float)cos(angle), b = (float)sin(angle);
+
+    const uchar* center = &img.at<uchar>(cvRound(kpt.pt.y), cvRound(kpt.pt.x));
+    if(iroi.at<uchar>(cvRound(kpt.pt.y), cvRound(kpt.pt.x))==255)
+        return;
+        
+    desc[32] = iroi.at<uchar>(cvRound(kpt.pt.y), cvRound(kpt.pt.x));
+
+    const int step = (int)img.step;
+
+    //rotation invariant
+    #define GET_VALUE(idx) \
+        center[cvRound(pattern[idx].x*b + pattern[idx].y*a)*step + \
+               cvRound(pattern[idx].x*a - pattern[idx].y*b)]
 
     for (int i = 0; i < 32; ++i, pattern += 16)
     {
@@ -1042,6 +1088,15 @@ static void computeDescriptors(const Mat& image, vector<KeyPoint>& keypoints, Ma
         computeOrbDescriptor(keypoints[i], image, &pattern[0], descriptors.ptr((int)i));
 }
 
+static void computeDescriptorsWithRoi(const Mat& image, vector<KeyPoint>& keypoints, Mat& descriptors,
+                               const vector<Point>& pattern,const Mat& roi)
+{
+    descriptors = Mat::zeros((int)keypoints.size(), 33, CV_8UC1);
+
+    for (size_t i = 0; i < keypoints.size(); i++)
+        computeOrbDescriptorWithRoi(keypoints[i], image, &pattern[0], descriptors.ptr((int)i), roi);
+}
+
 void ORBextractor::operator()( cv::InputArray _image, cv::InputArray _mask, std::vector<cv::KeyPoint>& _keypoints,
                                     cv::OutputArray _descriptors, cv::InputArray _iRoi)
 { 
@@ -1074,7 +1129,7 @@ void ORBextractor::operator()( cv::InputArray _image, cv::InputArray _mask, std:
         _descriptors.release();
     else
     {
-        _descriptors.create(nkeypoints, 32, CV_8U);
+        _descriptors.create(nkeypoints, 33, CV_8U);
         descriptors = _descriptors.getMat();
     }
 
@@ -1096,9 +1151,9 @@ void ORBextractor::operator()( cv::InputArray _image, cv::InputArray _mask, std:
 
         // Compute the descriptors
         Mat desc = descriptors.rowRange(offset, offset + nkeypointsLevel);
-        
+
         //workingMat:images of ith level in pyramid; keypoints: keypoint in ith level; desc: descriptor area in descriptors' Mat; pattern: don't know
-        computeDescriptors(workingMat, keypoints, desc, pattern); 
+        computeDescriptorsWithRoi(workingMat, keypoints, desc, pattern, mRoi); 
 
         offset += nkeypointsLevel;
 

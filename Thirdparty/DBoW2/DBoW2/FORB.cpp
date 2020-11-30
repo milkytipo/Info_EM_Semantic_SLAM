@@ -23,7 +23,7 @@ namespace DBoW2 {
 
 // --------------------------------------------------------------------------
 
-const int FORB::L=32;
+const int FORB::L=33;
 
 void FORB::meanValue(const std::vector<FORB::pDescriptor> &descriptors, 
   FORB::TDescriptor &mean)
@@ -174,14 +174,14 @@ void FORB::toMat32F(const std::vector<TDescriptor> &descriptors,
 void FORB::toMat8U(const std::vector<TDescriptor> &descriptors, 
   cv::Mat &mat)
 {
-  mat.create(descriptors.size(), 32, CV_8U);
+  mat.create(descriptors.size(), 33, CV_8U);
   
   unsigned char *p = mat.ptr<unsigned char>();
   
-  for(size_t i = 0; i < descriptors.size(); ++i, p += 32)
+  for(size_t i = 0; i < descriptors.size(); ++i, p += 33)
   {
     const unsigned char *d = descriptors[i].ptr<unsigned char>();
-    std::copy(d, d+32, p);
+    std::copy(d, d+33, p);
   }
   
 }

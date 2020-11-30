@@ -237,10 +237,15 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
 }
 
 
-cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp)
+cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im,const cv::Mat &iroi,const cv::Mat &iscore, const double &timestamp)
 {
     mImGray = im;
-
+    mImRoi = iroi;
+    mImScore = iscore;
+    if(!mImScore.channels()==1 && !mImRoi.channels()==1 ){
+        std::cout<<"Roi and Score images type is not CV8U1"<<std::endl;
+        return;
+    }
     if(mImGray.channels()==3)
     {
         if(mbRGB)
@@ -257,9 +262,9 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp)
     }
 
     if(mState==NOT_INITIALIZED || mState==NO_IMAGES_YET)
-        mCurrentFrame = Frame(mImGray,timestamp,mpIniORBextractor,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
+        mCurrentFrame = Frame(mImGray,mImRoi,mImScore,timestamp,mpIniORBextractor,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
     else
-        mCurrentFrame = Frame(mImGray,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
+        mCurrentFrame = Frame(mImGray,mImRoi,mImScore,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
 
     Track();
 
@@ -934,9 +939,9 @@ bool Tracking::TrackLocalMap()
     // We have an estimation of the camera pose and some map points tracked in the frame.
     // We retrieve the local map and try to find matches to points in the local map.
 
-    UpdateLocalMap();
+    UpdateLocalMap();// Find the neighbour KF and mappoints
 
-    SearchLocalPoints();
+    SearchLocalPoints();// Have a further search of keypoints which could be reprojected into current frame
 
     // Optimize Pose
     Optimizer::PoseOptimization(&mCurrentFrame);
@@ -1200,8 +1205,8 @@ void Tracking::UpdateLocalMap()
     mpMap->SetReferenceMapPoints(mvpLocalMapPoints);
 
     // Update
-    UpdateLocalKeyFrames();
-    UpdateLocalPoints();
+    UpdateLocalKeyFrames();//Find the neighbour KF, put them into mvpLocalKeyFrames
+    UpdateLocalPoints();// Find the covisibility mappoints, put them into mvpLocalMapPoints
 }
 
 void Tracking::UpdateLocalPoints()
