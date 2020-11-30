@@ -30,7 +30,8 @@
 #include <message_filters/time_synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include<opencv2/core/core.hpp>
-
+#include <geometry_msgs/TransformStamped.h>
+#include <geometry_msgs/PoseStamped.h>
 #include"../../../include/System.h"
 
 using namespace std;
@@ -48,11 +49,13 @@ public:
         pub_tf = nh2.advertise<geometry_msgs::TransformStamped>("/slam/tf",10);
     }
 
-    void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg,const sensor_msgs::ImageConstPtr& msgRoi,const sensor_msgs::ImageConstPtr& msgScore);
+    void GrabImage(const sensor_msgs::ImageConstPtr& msg,const sensor_msgs::ImageConstPtr& msgRoi,const sensor_msgs::ImageConstPtr& msgScore);
 
     ORB_SLAM2::System* mpSLAM;
     geometry_msgs::PoseStamped msg;
     geometry_msgs::TransformStamped tf1;
+    cv::Mat Twc;
+    float q[4];
 };
 
 int main(int argc, char **argv)
@@ -73,12 +76,12 @@ int main(int argc, char **argv)
     ImageGrabber igb(&SLAM);
 
     ros::NodeHandle nh;
-    ros::Subscriber sub = nh.subscribe("/camera/image_raw", 1, &ImageGrabber::GrabImage,&igb);
+    // ros::Subscriber sub = nh.subscribe("/camera/image_raw", 1, &ImageGrabber::GrabImage,&igb);
     message_filters::Subscriber<sensor_msgs::Image> rgb_sub(nh, "/camera/image_raw", 1);
     message_filters::Subscriber<sensor_msgs::Image> roi_sub(nh, "/roi_image", 1);
     message_filters::Subscriber<sensor_msgs::Image> score_sub(nh, "/roi_score_image", 1);
     
-    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image,sensor_msgs::Image> sync_pol;
+    typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image,sensor_msgs::Image,sensor_msgs::Image> sync_pol;
     message_filters::Synchronizer<sync_pol> sync(sync_pol(10), rgb_sub,roi_sub,score_sub); // no synchronize the roi and image since the frequency is too low 
     sync.registerCallback(boost::bind(&ImageGrabber::GrabImage,&igb,_1,_2,_3)); 
 
@@ -117,8 +120,7 @@ void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg,const sensor_
 
     mpSLAM->TrackMonocular(cv_ptr->image,roi_ptr->image,score_ptr->image,cv_ptr->header.stamp.toSec());
     if(mpSLAM->GetFramePose(Twc, q)){
-
-        tf1.header.stamp = msgRGB->header.stamp;
+        tf1.header.stamp = msg->header.stamp;
         tf1.header.frame_id = "world" ;
         tf1.child_frame_id = "slam" ;
         tf1.transform.translation.x = Twc.at<float>(2);//Twc.at<float>(0);

@@ -236,6 +236,36 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
     return mCurrentFrame.mTcw.clone();
 }
 
+//Only mono
+cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp)
+{
+    mImGray = im;
+
+    if(mImGray.channels()==3)
+    {
+        if(mbRGB)
+            cvtColor(mImGray,mImGray,CV_RGB2GRAY);
+        else
+            cvtColor(mImGray,mImGray,CV_BGR2GRAY);
+    }
+    else if(mImGray.channels()==4)
+    {
+        if(mbRGB)
+            cvtColor(mImGray,mImGray,CV_RGBA2GRAY);
+        else
+            cvtColor(mImGray,mImGray,CV_BGRA2GRAY);
+    }
+
+    if(mState==NOT_INITIALIZED || mState==NO_IMAGES_YET)
+        mCurrentFrame = Frame(mImGray,timestamp,mpIniORBextractor,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
+    else
+        mCurrentFrame = Frame(mImGray,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
+
+    Track();
+
+    return mCurrentFrame.mTcw.clone();
+}
+
 
 cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im,const cv::Mat &iroi,const cv::Mat &iscore, const double &timestamp)
 {
@@ -244,7 +274,6 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im,const cv::Mat &iroi,const
     mImScore = iscore;
     if(!mImScore.channels()==1 && !mImRoi.channels()==1 ){
         std::cout<<"Roi and Score images type is not CV8U1"<<std::endl;
-        return;
     }
     if(mImGray.channels()==3)
     {
