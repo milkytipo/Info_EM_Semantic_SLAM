@@ -261,6 +261,15 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imRoi, const cv::Mat &imScore
     mvDepth = vector<float>(N,-1);
 
     mvpMapPoints = vector<MapPoint*>(N,static_cast<MapPoint*>(NULL));
+    
+    //Obtain class id and scores from mScore images.
+    for(int i=0; i<mDescriptors.rows;i++){
+       mvpMapPoints[i]->mClassId = mDescriptors.ptr<uchar>(i)[-1]; 
+       assert(mvKeys.size() == mDescriptors.rows); //mvKeys.size() shoulde be equal as mDescriptors.rows 
+       mvpMapPoints[i]->mP = imScore.at<float>(cvRound(mvKeys[i].pt.y), cvRound(mvKeys[i].pt.x));
+       mvpMapPoints[i]->ComputeEntropy(); 
+    }
+
     mvbOutlier = vector<bool>(N,false);
 
     // This is done only for the first Frame (or after a change in the calibration)

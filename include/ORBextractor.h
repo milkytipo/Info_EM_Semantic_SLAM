@@ -87,7 +87,7 @@ public:
     }
 
     std::vector<cv::Mat> mvImagePyramid;
-    cv::Mat mRoi;
+    cv::Mat mRoi, mScore;
 
 protected:
 

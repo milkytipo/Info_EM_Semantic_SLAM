@@ -1325,6 +1325,7 @@ int ORBmatcher::SearchBySim3(KeyFrame *pKF1, KeyFrame *pKF2, vector<MapPoint*> &
     return nFound;
 }
 
+//Mono
 int ORBmatcher::SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, const float th, const bool bMono)
 {
     int nmatches = 0;
@@ -1413,6 +1414,12 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, 
                     }
 
                     const cv::Mat &d = CurrentFrame.mDescriptors.row(i2);
+
+                    // Charge if the classid is the same. Note:d and dMP should be a 1-demension matrix. 
+                    if(dMP.ptr<uchar>(0)[32] != d.ptr<uchar>(0)[32] ){
+                        std::cout<< "Debug: the last frame is " << dMP.ptr<uchar>(0)[32] << "; while current is "<< d.ptr<uchar>(0)[32] << std::endl;
+                        continue;
+                    }
 
                     const int dist = DescriptorDistance(dMP,d);
 
@@ -1515,7 +1522,6 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, KeyFrame *pKF, const set
 
                 const float maxDistance = pMP->GetMaxDistanceInvariance();
                 const float minDistance = pMP->GetMinDistanceInvariance();
-
                 // Depth must be inside the scale pyramid of the image
                 if(dist3D<minDistance || dist3D>maxDistance)
                     continue;

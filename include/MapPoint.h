@@ -90,6 +90,16 @@ public:
     long int mnFirstKFid;
     long int mnFirstFrame;
     int nObs;
+    
+    //classification
+    size_t mClassId;
+
+    //probablity of classfication
+    float mP;
+    
+    //Infomation:entropy
+    float mEntropy;
+    
 
     // Variables used by the tracking
     float mTrackProjX;
@@ -116,15 +126,6 @@ public:
     static std::mutex mGlobalMutex;
 
 protected:    
-    //classification
-    size_t mClassId;
-
-    //probablity of classfication
-    float mP;
-    
-    //Infomation:entropy
-    float mEntropy;
-    
      // Position in absolute coordinates
      cv::Mat mWorldPos;
 
