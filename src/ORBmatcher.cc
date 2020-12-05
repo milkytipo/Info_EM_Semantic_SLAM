@@ -1433,6 +1433,10 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, 
                 if(bestDist<=TH_HIGH)
                 {
                     CurrentFrame.mvpMapPoints[bestIdx2]=pMP;
+
+                    //update probability
+                    CurrentFrame.mvpMapPoints[bestIdx2]->mP *= pMP->mP;
+
                     nmatches++;
 
                     if(mbCheckOrientation)

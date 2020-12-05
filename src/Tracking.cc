@@ -910,7 +910,8 @@ bool Tracking::TrackWithMotionModel()
 
     mCurrentFrame.SetPose(mVelocity*mLastFrame.mTcw);
 
-    fill(mCurrentFrame.mvpMapPoints.begin(),mCurrentFrame.mvpMapPoints.end(),static_cast<MapPoint*>(NULL));
+    //Warining:This commence shoud be  double check
+    // fill(mCurrentFrame.mvpMapPoints.begin(),mCurrentFrame.mvpMapPoints.end(),static_cast<MapPoint*>(NULL));
 
     // Project points seen in previous frame
     int th;
@@ -923,12 +924,14 @@ bool Tracking::TrackWithMotionModel()
     // If few matches, uses a wider window search
     if(nmatches<20)
     {
-        fill(mCurrentFrame.mvpMapPoints.begin(),mCurrentFrame.mvpMapPoints.end(),static_cast<MapPoint*>(NULL));
+        // fill(mCurrentFrame.mvpMapPoints.begin(),mCurrentFrame.mvpMapPoints.end(),static_cast<MapPoint*>(NULL));
         nmatches = matcher.SearchByProjection(mCurrentFrame,mLastFrame,2*th,mSensor==System::MONOCULAR);
     }
 
     if(nmatches<20)
         return false;
+
+    //TODO(zida)：：if probablity is less than threshold, delete the points.
 
     // Optimize frame pose with all matches
     Optimizer::PoseOptimization(&mCurrentFrame);
@@ -956,7 +959,7 @@ bool Tracking::TrackWithMotionModel()
 
     if(mbOnlyTracking)
     {
-        mbVO = nmatchesMap<10;
+        mbVO = nmatchesMap<10; //if match points > 10
         return nmatches>20;
     }
 
