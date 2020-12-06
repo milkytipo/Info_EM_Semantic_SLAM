@@ -1436,6 +1436,7 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, 
 
                     //update probability
                     CurrentFrame.mvpMapPoints[bestIdx2]->mP *= pMP->mP;
+                    CurrentFrame.mvpMapPoints[bestIdx2]->ComputeEntropy();
 
                     nmatches++;
 

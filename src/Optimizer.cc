@@ -296,7 +296,11 @@ int Optimizer::PoseOptimization(Frame *pFrame)
 
                 e->setVertex(0, dynamic_cast<g2o::OptimizableGraph::Vertex*>(optimizer.vertex(0)));
                 e->setMeasurement(obs);
-                const float invSigma2 = pFrame->mvInvLevelSigma2[kpUn.octave];
+                float invSigma2 = pFrame->mvInvLevelSigma2[kpUn.octave];
+
+                //Add probablity as weight into Info matrix
+                invSigma2 *= pMP->mP;
+                std::cout<<"Info:invsigma2 is " << invSigma2 << std::endl;
                 e->setInformation(Eigen::Matrix2d::Identity()*invSigma2);
 
                 g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
