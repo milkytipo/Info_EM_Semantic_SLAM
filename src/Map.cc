@@ -21,7 +21,7 @@
 #include "Map.h"
 
 #include<mutex>
-
+#include<algorithm>
 namespace ORB_SLAM2
 {
 
@@ -115,19 +115,19 @@ void Map::IsGoodObservationInCurrentLandmark(){
     }
 }
 
-
 bool Map::IsMapPointInLandmark(MapPoint* pMp){
 
     for(set<Landmark*>::iterator it=mspLandmarks.begin();it!=mspLandmarks.end();it++){
         if(pMp->mClassId != (*it)->mLandmarkClassId){
             return false;
         }else{
-            if ((*it)->mvlmCluster.count(pMp)){
-                std::cout<<"Debug: Find point any landmark" <<std::endl;
-                return true;
-            }else{
+            vector<MapPoint*>::iterator iter=find((*it)->mvlmCluster.begin(),(*it)->mvlmCluster.end(),pMp);
+            if (iter == (*it)->mvlmCluster.end()){
                 std::cout<<"Debug: no such point in any landmark" <<std::endl;
                 return false;
+            }else{
+                std::cout<<"Debug: Find point any landmark" <<std::endl;
+                return true;
             }
         }
     }

@@ -37,6 +37,7 @@
 #include "KeyFrameDatabase.h"
 #include "ORBVocabulary.h"
 #include "Viewer.h"
+#include "Landmark.h"
 
 namespace ORB_SLAM2
 {
@@ -47,6 +48,7 @@ class Map;
 class Tracking;
 class LocalMapping;
 class LoopClosing;
+class Landmark;
 
 class System
 {

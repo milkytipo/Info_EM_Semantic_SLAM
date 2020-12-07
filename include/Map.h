@@ -24,17 +24,17 @@
 #include "MapPoint.h"
 #include "KeyFrame.h"
 #include "Landmark.h"
+
 #include <set>
 
 #include <mutex>
-
-
 
 namespace ORB_SLAM2
 {
 
 class MapPoint;
 class KeyFrame;
+class Landmark;
 
 class Map
 {

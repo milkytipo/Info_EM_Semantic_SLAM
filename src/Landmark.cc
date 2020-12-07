@@ -10,8 +10,7 @@
 namespace ORB_SLAM2
 {
 
-long unsigned int Landmark::nNextId=0;
-mutex MapPoLandmarkint::mGlobalMutex;
+mutex Landmark::mGlobalMutex;
 
 Landmark::Landmark(const size_t id):mLandmarkId(id)
 {
@@ -43,7 +42,7 @@ bool Landmark::isGoodObservation(){
             mvlmClusterCurrentFrame.clear();
             mGoodObservation = false;
         }else{
-            mvlmCluster.insert(mvlmCluster.end(), mvlmClusterCurrentFrame.begin(), mvlmClusterCurrentFrame.end())
+            mvlmCluster.insert(mvlmCluster.end(), mvlmClusterCurrentFrame.begin(), mvlmClusterCurrentFrame.end());
             mvlmClusterCurrentFrame.clear();
             mGoodObservation = true;
         }
