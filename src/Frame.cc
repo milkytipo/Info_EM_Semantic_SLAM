@@ -270,6 +270,7 @@ Frame::Frame(const cv::Mat &imGray, const cv::Mat &imRoi, const cv::Mat &imScore
        mvpMapPoints[i]->ComputeEntropy(); 
     }
 
+
     mvbOutlier = vector<bool>(N,false);
 
     // This is done only for the first Frame (or after a change in the calibration)

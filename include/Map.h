@@ -23,6 +23,7 @@
 
 #include "MapPoint.h"
 #include "KeyFrame.h"
+#include "Landmark.h"
 #include <set>
 
 #include <mutex>
@@ -42,11 +43,19 @@ public:
 
     void AddKeyFrame(KeyFrame* pKF);
     void AddMapPoint(MapPoint* pMP);
+    void AddLandmark(size_t l_id);
+
+    void AddPointIntoLandmark(MapPoint* pMp);
+    void AddPointIntoCurrentLandmark(MapPoint* pMp);
+    
     void EraseMapPoint(MapPoint* pMP);
     void EraseKeyFrame(KeyFrame* pKF);
     void SetReferenceMapPoints(const std::vector<MapPoint*> &vpMPs);
     void InformNewBigChange();
     int GetLastBigChangeIdx();
+
+    bool IsMapPointInLandmark(MapPoint* pMp);
+    bool IsNewLandmark(size_t l_id);
 
     std::vector<KeyFrame*> GetAllKeyFrames();
     std::vector<MapPoint*> GetAllMapPoints();
@@ -69,6 +78,7 @@ public:
 protected:
     std::set<MapPoint*> mspMapPoints;
     std::set<KeyFrame*> mspKeyFrames;
+    std::set<Landmark*> mspLandmarks;
 
     std::vector<MapPoint*> mvpReferenceMapPoints;
 

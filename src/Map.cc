@@ -43,6 +43,34 @@ void Map::AddMapPoint(MapPoint *pMP)
     mspMapPoints.insert(pMP);
 }
 
+void Map::AddLandmark(size_t l_id)
+{
+    unique_lock<mutex> lock(mMutexMap);
+    Landmark* lM = new Landmark(l_id);
+    mspLandmarks.insert(lM);
+}
+
+void Map::AddPointIntoLandmark(MapPoint* pMp)
+{
+    unique_lock<mutex> lock(mMutexMap);
+    for(set<Landmark*>::iterator it=mspLandmarks.begin();it!=mspLandmarks.end();it++){
+        if(pMp->mClassId == (*it)->mLandmarkClassId){
+            (*it)->AddLandmarkPoint(pMp);
+        }
+    }
+}
+
+void Map::AddPointIntoCurrentLandmark(MapPoint* pMp)
+{
+    unique_lock<mutex> lock(mMutexMap);
+    for(set<Landmark*>::iterator it=mspLandmarks.begin();it!=mspLandmarks.end();it++){
+        if(pMp->mClassId == (*it)->mLandmarkClassId){
+            (*it)->AddCurrentLandmarkPoint(pMp);
+        }
+    }
+
+}
+
 void Map::EraseMapPoint(MapPoint *pMP)
 {
     unique_lock<mutex> lock(mMutexMap);
@@ -78,6 +106,33 @@ int Map::GetLastBigChangeIdx()
     unique_lock<mutex> lock(mMutexMap);
     return mnBigChangeIdx;
 }
+
+bool Map::IsMapPointInLandmark(MapPoint* pMp){
+
+    for(set<Landmark*>::iterator it=mspLandmarks.begin();it!=mspLandmarks.end();it++){
+        if(pMp->mClassId != (*it)->mLandmarkClassId){
+            return false;
+        }else{
+            if ((*it)->mvlmCluster.count(pMp)){
+                std::cout<<"Debug: Find point any landmark" <<std::endl;
+                return true;
+            }else{
+                std::cout<<"Debug: no such point in any landmark" <<std::endl;
+                return false;
+            }
+        }
+    }
+}
+
+bool Map::IsNewLandmark(size_t l_id){
+    for(set<Landmark*>::iterator it=mspLandmarks.begin();it!=mspLandmarks.end();it++){
+        if(l_id== (*it)->mLandmarkClassId){
+            return true;
+        }        
+    }
+    return false;
+}
+
 
 vector<KeyFrame*> Map::GetAllKeyFrames()
 {
@@ -122,9 +177,11 @@ void Map::clear()
 
     for(set<KeyFrame*>::iterator sit=mspKeyFrames.begin(), send=mspKeyFrames.end(); sit!=send; sit++)
         delete *sit;
-
+    for(set<Landmark*>::iterator sit=mspLandmarks.begin(), send=mspLandmarks.end(); sit!=send; sit++)
+        delete *sit;
     mspMapPoints.clear();
     mspKeyFrames.clear();
+    mspLandmarks.clear();
     mnMaxKFid = 0;
     mvpReferenceMapPoints.clear();
     mvpKeyFrameOrigins.clear();

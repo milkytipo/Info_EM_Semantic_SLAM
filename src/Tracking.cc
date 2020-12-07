@@ -266,7 +266,7 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp)
     return mCurrentFrame.mTcw.clone();
 }
 
-
+//Mono with Roi
 cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im,const cv::Mat &iroi,const cv::Mat &iscore, const double &timestamp)
 {
     mImGray = im;
@@ -710,6 +710,18 @@ void Tracking::CreateInitialMapMonocular()
 
         //Add to Map
         mpMap->AddMapPoint(pMP);
+
+        //Add to landmark
+        if (!mpMap->IsNewLandmark(pMP->mClassId)){
+            mpMap->AddLandmark(pMP->mClassId);
+        }
+
+        if(mpMap->IsMapPointInLandmark(pMP)) {
+            continue;
+        }else{
+           mpMap->AddPointIntoLandmark(pMP);
+        }
+       
     }
 
     // Update Connections

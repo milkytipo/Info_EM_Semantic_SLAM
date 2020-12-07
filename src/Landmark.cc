@@ -13,21 +13,27 @@ namespace ORB_SLAM2
 long unsigned int Landmark::nNextId=0;
 mutex MapPoLandmarkint::mGlobalMutex;
 
-Landmark::Landmark(){
+Landmark::Landmark(const size_t id):mLandmarkId(id)
+{
     mLastCluserSize = 0;
 };
 
 
 void Landmark::AddLandmarkPoint(MapPoint* pMapPoint){
-    mvlmClusterCurrentFrame.push_back(pMapPoint);
+    mvlmCluster.insert(pMapPoint);
 }
+
+void Landmark::AddCurrentLandmarkPoint(MapPoint* pMapPoint){
+    mvlmClusterCurrentFrame.insert(pMapPoint);
+}
+
 
 bool Landmark::isGoodObservation(){
 
     size_t N = mvlmClusterCurrentFrame.size();
     float_t infoTemp = 0;
-    for(int i=0; i<N; i++){
-        infoTemp += mvlmClusterCurrentFrame[i]->mEntropy;
+    for(set<Landmark*>::iterator it=mvlmClusterCurrentFrame.begin();it!=mvlmClusterCurrentFrame.end();it++){
+        infoTemp += (*it)->mEntropy;
     }
 
     //The average info should not be changed too large 
@@ -49,23 +55,11 @@ void Landmark::CalculateInfo(){
 
     size_t N = mvlmCluster.size();
     
-    for(int i=0; i<N; i++){
-        mInfoSum += mvlmCluster[i]->mEntropy;
+    for(set<MapPoint*>::iterator it=mvlmCluster.begin();it!=mvlmCluster.end();it++){
+        mInfoSum +=(*it)->mEntropy;
     }
-
-    mLastCluserSize = N;
-}
-
-void Landmark::UpdateInfo(){
     
-    size_t N = mvlmCluster.size();
-
-    for(int i=mLastCluserSize; i<N; i++){
-        mInfoSum += mvlmCluster[i]->mEntropy;
-    }
-
     mLastCluserSize = N;
-
 }
 
 

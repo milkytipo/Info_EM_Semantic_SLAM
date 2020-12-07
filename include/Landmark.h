@@ -26,7 +26,7 @@ class MapPoint;
 class Landmark
 {
 public:
-    Landmark();
+    Landmark(const size_t id);
     // MapPoint(const cv::Mat &Pos, KeyFrame* pRefKF, Map* pMap);
     // MapPoint(const cv::Mat &Pos,  Map* pMap, Frame* pFrame, const int &idxF);
 
@@ -34,9 +34,10 @@ public:
     cv::Mat GetWorldPos();
 
     void CalculateInfo();
-    void UpdateInfo();
     
     void AddLandmarkPoint(MapPoint* pMapPoint);
+    void AddCurrentLandmarkPoint(MapPoint* pMapPoint);
+
 
     bool isGoodObservation();
     
@@ -45,8 +46,8 @@ public:
 
     size_t mLandmarkClassId;
 
-    std::vector<MapPoint*> mvlmCluster; 
-    std::vector<MapPoint*> mvlmClusterCurrentFrame; 
+    std::set<MapPoint*> mvlmCluster; 
+    std::set<MapPoint*> mvlmClusterCurrentFrame; 
 
 
     float_t mProbSport;
