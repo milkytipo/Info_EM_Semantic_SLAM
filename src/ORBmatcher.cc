@@ -1433,7 +1433,7 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, 
                 if(bestDist<=TH_HIGH)
                 {
                     CurrentFrame.mvpMapPoints[bestIdx2]=pMP;
-
+                    
                     //update probability
                     CurrentFrame.mvpMapPoints[bestIdx2]->mP *= pMP->mP;
                     CurrentFrame.mvpMapPoints[bestIdx2]->ComputeEntropy();
@@ -1472,6 +1472,7 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, 
                 for(size_t j=0, jend=rotHist[i].size(); j<jend; j++)
                 {
                     CurrentFrame.mvpMapPoints[rotHist[i][j]]=static_cast<MapPoint*>(NULL);
+
                     nmatches--;
                 }
             }

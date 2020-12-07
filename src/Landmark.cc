@@ -20,11 +20,11 @@ Landmark::Landmark(const size_t id):mLandmarkId(id)
 
 
 void Landmark::AddLandmarkPoint(MapPoint* pMapPoint){
-    mvlmCluster.insert(pMapPoint);
+    mvlmCluster.push_back(pMapPoint);
 }
 
 void Landmark::AddCurrentLandmarkPoint(MapPoint* pMapPoint){
-    mvlmClusterCurrentFrame.insert(pMapPoint);
+    mvlmClusterCurrentFrame.push_back(pMapPoint);
 }
 
 
@@ -32,7 +32,7 @@ bool Landmark::isGoodObservation(){
 
     size_t N = mvlmClusterCurrentFrame.size();
     float_t infoTemp = 0;
-    for(set<Landmark*>::iterator it=mvlmClusterCurrentFrame.begin();it!=mvlmClusterCurrentFrame.end();it++){
+    for(vector<MapPoint*>::iterator it=mvlmClusterCurrentFrame.begin();it!=mvlmClusterCurrentFrame.end();it++){
         infoTemp += (*it)->mEntropy;
     }
 
@@ -41,21 +41,22 @@ bool Landmark::isGoodObservation(){
     if (N_2 > 0){
         if( abs( mInfoSum/N_2 - infoTemp/N ) > mInfoSum/(N_2*3.0)){ 
             mvlmClusterCurrentFrame.clear();
-            return false;
+            mGoodObservation = false;
         }else{
             mvlmCluster.insert(mvlmCluster.end(), mvlmClusterCurrentFrame.begin(), mvlmClusterCurrentFrame.end())
             mvlmClusterCurrentFrame.clear();
-            return true;
+            mGoodObservation = true;
         }
     }
 
+    return mGoodObservation;
 }
 
 void Landmark::CalculateInfo(){
 
     size_t N = mvlmCluster.size();
     
-    for(set<MapPoint*>::iterator it=mvlmCluster.begin();it!=mvlmCluster.end();it++){
+    for(vector<MapPoint*>::iterator it=mvlmCluster.begin();it!=mvlmCluster.end();it++){
         mInfoSum +=(*it)->mEntropy;
     }
     

@@ -720,6 +720,7 @@ void Tracking::CreateInitialMapMonocular()
             continue;
         }else{
            mpMap->AddPointIntoLandmark(pMP);
+        //    mpMap->AddPointIntoCurrentLandmark(pMP);
         }
        
     }
@@ -942,6 +943,23 @@ bool Tracking::TrackWithMotionModel()
 
     if(nmatches<20)
         return false;
+
+    for(int i=0; i< mCurrentFrame.N; i++){
+
+        MapPoint* temppMp = mCurrentFrame.mvpMapPoints[i];
+        //Add to landmark
+        if (!mpMap->IsNewLandmark(temppMp->mClassId)){
+            mpMap->AddLandmark(temppMp->mClassId);
+        }
+
+        if(mpMap->IsMapPointInLandmark(temppMp)) {
+            continue;
+        }else{
+           mpMap->AddPointIntoCurrentLandmark(temppMp);
+        }
+    }
+
+    mpMap->IsGoodObservationInCurrentLandmark();
 
     //TODO(zida)：：if probablity is less than threshold, delete the points.
 

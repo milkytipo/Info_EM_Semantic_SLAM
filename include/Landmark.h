@@ -38,7 +38,7 @@ public:
     void AddLandmarkPoint(MapPoint* pMapPoint);
     void AddCurrentLandmarkPoint(MapPoint* pMapPoint);
 
-
+    //Good observation is charged by entropy 
     bool isGoodObservation();
     
 public:
@@ -46,8 +46,10 @@ public:
 
     size_t mLandmarkClassId;
 
-    std::set<MapPoint*> mvlmCluster; 
-    std::set<MapPoint*> mvlmClusterCurrentFrame; 
+    bool mGoodObservation;
+
+    std::vector<MapPoint*> mvlmCluster; 
+    std::vector<MapPoint*> mvlmClusterCurrentFrame; 
 
 
     float_t mProbSport;

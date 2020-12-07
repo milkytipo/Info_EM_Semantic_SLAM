@@ -68,7 +68,6 @@ void Map::AddPointIntoCurrentLandmark(MapPoint* pMp)
             (*it)->AddCurrentLandmarkPoint(pMp);
         }
     }
-
 }
 
 void Map::EraseMapPoint(MapPoint *pMP)
@@ -106,6 +105,16 @@ int Map::GetLastBigChangeIdx()
     unique_lock<mutex> lock(mMutexMap);
     return mnBigChangeIdx;
 }
+
+void Map::IsGoodObservationInCurrentLandmark(){
+    
+    for(set<Landmark*>::iterator it=mspLandmarks.begin();it!=mspLandmarks.end();it++){
+        if((*it)->mvlmClusterCurrentFrame.size() !=0){
+            (*it)->isGoodObservation();
+        }
+    }
+}
+
 
 bool Map::IsMapPointInLandmark(MapPoint* pMp){
 
@@ -145,6 +154,12 @@ vector<MapPoint*> Map::GetAllMapPoints()
     unique_lock<mutex> lock(mMutexMap);
     return vector<MapPoint*>(mspMapPoints.begin(),mspMapPoints.end());
 }
+
+long unsigned int Map::NumLandmarksInMap(){
+    unique_lock<mutex> lock(mMutexMap);
+    return mspLandmarks.size();
+}
+
 
 long unsigned int Map::MapPointsInMap()
 {

@@ -45,15 +45,16 @@ public:
     void AddMapPoint(MapPoint* pMP);
     void AddLandmark(size_t l_id);
 
-    void AddPointIntoLandmark(MapPoint* pMp);
+    void AddPointIntoLandmark(MapPoint* pMp);//only by initialization
     void AddPointIntoCurrentLandmark(MapPoint* pMp);
-    
+
     void EraseMapPoint(MapPoint* pMP);
     void EraseKeyFrame(KeyFrame* pKF);
     void SetReferenceMapPoints(const std::vector<MapPoint*> &vpMPs);
     void InformNewBigChange();
     int GetLastBigChangeIdx();
 
+    void IsGoodObservationInCurrentLandmark();
     bool IsMapPointInLandmark(MapPoint* pMp);
     bool IsNewLandmark(size_t l_id);
 
@@ -63,6 +64,8 @@ public:
 
     long unsigned int MapPointsInMap();
     long unsigned  KeyFramesInMap();
+
+    long unsigned int NumLandmarksInMap();
 
     long unsigned int GetMaxKFid();
 
