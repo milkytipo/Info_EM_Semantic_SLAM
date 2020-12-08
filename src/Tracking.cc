@@ -821,6 +821,25 @@ bool Tracking::TrackReferenceKeyFrame()
     mCurrentFrame.mvpMapPoints = vpMapPointMatches;
     mCurrentFrame.SetPose(mLastFrame.mTcw);
 
+    for(int i=0; i< mCurrentFrame.N; i++){
+
+        MapPoint* temppMp = mCurrentFrame.mvpMapPoints[i];
+        //Add to landmark
+        if (!mpMap->IsNewLandmark(temppMp->mClassId)){
+            mpMap->AddLandmark(temppMp->mClassId);
+        }
+
+        if(mpMap->IsMapPointInLandmark(temppMp)) {
+            continue;
+        }else{
+           mpMap->AddPointIntoCurrentLandmark(temppMp);
+        }
+    }
+
+    mpMap->IsGoodObservationInCurrentLandmark();
+
+    //TODO(zida)：：if probablity is less than threshold, delete the points.
+
     Optimizer::PoseOptimization(&mCurrentFrame);
 
     // Discard outliers

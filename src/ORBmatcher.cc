@@ -211,6 +211,11 @@ int ORBmatcher::SearchByBoW(KeyFrame* pKF,Frame &F, vector<MapPoint*> &vpMapPoin
 
                     const cv::Mat &dF = F.mDescriptors.row(realIdxF);
 
+                    if(dKF.ptr<uchar>(0)[32] != dF.ptr<uchar>(0)[32] ){
+                        std::cout<< "Debug: the last frame is " << dKF.ptr<uchar>(0)[32] << "; while current is "<< d.ptr<uchar>(0)[32] << std::endl;
+                        continue;
+                    }
+
                     const int dist =  DescriptorDistance(dKF,dF);
 
                     if(dist<bestDist1)
@@ -229,6 +234,7 @@ int ORBmatcher::SearchByBoW(KeyFrame* pKF,Frame &F, vector<MapPoint*> &vpMapPoin
                 {
                     if(static_cast<float>(bestDist1)<mfNNratio*static_cast<float>(bestDist2))
                     {
+                        float new_mp = F.mvpMapPoints[bestIdxF]->mP * pMP->mP;
                         vpMapPointMatches[bestIdxF]=pMP;
 
                         const cv::KeyPoint &kp = pKF->mvKeysUn[realIdxKF];
@@ -244,6 +250,10 @@ int ORBmatcher::SearchByBoW(KeyFrame* pKF,Frame &F, vector<MapPoint*> &vpMapPoin
                             assert(bin>=0 && bin<HISTO_LENGTH);
                             rotHist[bin].push_back(bestIdxF);
                         }
+                        //update probability
+                        vpMapPointMatches[bestIdxF]->mP =new_mp;
+                        vpMapPointMatches[bestIdxF]->ComputeEntropy();
+                        vpMapPointMatches[bestIdxF]->mClassId = F.mvpMapPoints[bestIdxF]->mClassId;
                         nmatches++;
                     }
                 }
@@ -1432,10 +1442,12 @@ int ORBmatcher::SearchByProjection(Frame &CurrentFrame, const Frame &LastFrame, 
 
                 if(bestDist<=TH_HIGH)
                 {
+                    float new_mp = (CurrentFrame.mvpMapPoints[bestIdx2]->mP) * (pMP->mP);
                     CurrentFrame.mvpMapPoints[bestIdx2]=pMP;
                     
+                    //TODO(zida): how to update classid?
                     //update probability
-                    CurrentFrame.mvpMapPoints[bestIdx2]->mP *= pMP->mP;
+                    CurrentFrame.mvpMapPoints[bestIdx2]->mP = new_mp;
                     CurrentFrame.mvpMapPoints[bestIdx2]->ComputeEntropy();
 
                     nmatches++;
